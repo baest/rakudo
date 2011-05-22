@@ -541,9 +541,13 @@ multi infix:«>»(Date $a, Date $b) is export {
     $a.daycount > $b.daycount
 }
 
+#TODO Make this '=head1 SEE ALSO' again once we parse abbreviated blocks
 =begin pod
 
-=head1 SEE ALSO
+=begin head1
+SEE ALSO
+=end head1
+
 Perl 6 spec <S32-Temporal|http://perlcabal.org/syn/S32/Temporal.html>.
 The Perl 5 DateTime Project home page L<http://datetime.perl.org>.
 Perl 5 perldoc L<doc:DateTime> and L<doc:Time::Local>.

@@ -219,7 +219,7 @@ token ws {
 token unv {
     # :dba('horizontal whitespace')
     [
-    | ^^ <?before \h* '=' [ \w | '\\'] > <.pod_comment>
+    | ^^ <?before \h* '=' [ \w | '\\'] > <.pod_content>
     | \h* <comment>
     | \h+
     ]
@@ -244,29 +244,36 @@ token comment:sym<#=> {
     '#=' $<attachment>=[\N*]
 }
 
-token pod_comment {
-    ^^ \h* '='
+proto token pod_content { <...> }
+
+token pod_content:sym<block> {
+    \n* <pod_block> \n*
+}
+
+
+# any number of paragraphs of text
+token pod_content:sym<text> {
+    \n*
+    <pod_text_para> ** [\h* \n]+
+    \n*
+}
+
+# a single paragraph of text
+token pod_text_para {
+    $<text> = [ \h* <![=]> \N+ \n ] +
+}
+
+proto token pod_block { <...> }
+
+token pod_block:sym<delimited> {
+    ^^ \h* '=begin' \h+ <ident> \h* \n
     [
-    | 'begin' \h+ 'END' >>
-        [ .*? \n '=' 'end' \h+ 'END' » \N* || .* ]
-    | 'begin' \h+ <identifier>
-        [
-        ||  .*? \n '=' 'end' \h+ $<identifier> » \N*
-        ||  <.panic: '=begin without matching =end'>
-        ]
-    | 'begin' » \h*
-        [ $$ || '#' || <.panic: 'Unrecognized token after =begin'> ]
-        [
-        || .*? \n \h* '=' 'end' » \N*
-        || <.panic: '=begin without matching =end'>
-        ]
-    |
-        [ <?before .*? ^^ '=cut' » >
-          <.panic: 'Obsolete pod format, please use =begin/=end instead'> ]?
-        [ <alpha> || \s || <.panic: 'Illegal pod directive'> ]
-        \N*
+        <pod_content> *
+        ^^ \h* '=end' \h+ $<ident> \h* \n
+         ||  <.panic: '=begin without matching =end'>
     ]
 }
+
 
 ## Top-level rules
 
