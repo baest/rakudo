@@ -247,31 +247,56 @@ token comment:sym<#=> {
 proto token pod_content { <...> }
 
 token pod_content:sym<block> {
-    \n* <pod_block> \n*
+    <pod_newline>*
+    <pod_block>
+    <pod_newline>*
 }
-
 
 # any number of paragraphs of text
 token pod_content:sym<text> {
-    \n*
-    <pod_text_para> ** [\h* \n]+
-    \n*
+    <pod_newline>*
+    <pod_text_para> ** <pod_newline>+
+    <pod_newline>*
 }
 
 # a single paragraph of text
 token pod_text_para {
-    $<text> = [ \h* <![=]> \N+ \n ] +
+    $<text> = [ \h* <!before '=' \w> \N+ \n ] +
 }
 
 proto token pod_block { <...> }
 
 token pod_block:sym<delimited> {
-    ^^ \h* '=begin' \h+ <ident> \h* \n
+    ^^ \h* '=begin' \h+ <!before 'END'> <identifier> <pod_newline>+
     [
-        <pod_content> *
-        ^^ \h* '=end' \h+ $<ident> \h* \n
-         ||  <.panic: '=begin without matching =end'>
+     <pod_content> *
+     ^^ \h* '=end' \h+ $<identifier> <pod_newline>
+     ||  <.panic: '=begin without matching =end'>
     ]
+}
+
+token pod_block:sym<end> {
+    ^^ \h*
+    [
+        || '=begin' \h+ 'END' <pod_newline>
+        || '=for'   \h+ 'END' <pod_newline>
+        || '=END' \h+
+    ]
+    .*
+}
+
+token pod_block:sym<paragraph> {
+    ^^ \h* '=for' \h+ <!before 'END'> <identifier> <pod_newline>
+    $<pod_content> = <pod_text_para> *
+}
+
+token pod_block:sym<abbreviated> {
+    ^^ \h* '=' <!before begin || end || for || END> <identifier>
+    $<pod_content> = <pod_text_para> *
+}
+
+token pod_newline {
+    \h* \n
 }
 
 
