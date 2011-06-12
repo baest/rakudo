@@ -25,7 +25,7 @@ elements and can be flattened into Captures or Lists.
 .end
 
 
-.sub '' :vtable('get_string') :method
+.sub '' :vtable('get_string') :method :subid('Parcel.vtable_get_string')
     $S0 = self.'Str'()
     .return ($S0)
 .end
@@ -39,21 +39,12 @@ A Parcel in item context becomes a Seq.
 
 .sub 'item' :method
     x_enter_sublog
+    $P0 = descalarref self
     .local pmc seq
     seq = get_hll_global 'Seq'
-    seq = seq.'new_from_RPA'(self)
+    seq = seq.'new'($P0)
     seq = seq.'item'()
     .return (seq)
-.end
-
-
-=item hash()
-
-=cut
-
-.sub 'hash' :method
-    x_enter_sublog
-    .tailcall '&hash'(self)
 .end
 
 

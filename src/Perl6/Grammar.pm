@@ -2059,7 +2059,7 @@ token infix:sym<=> {
     <sym>
     [
     || <?{ $*LEFTSIGIL eq '$' }> <O('%item_assignment, :reducecheck<assign_check>')>
-    || <O('%list_assignment, :reducecheck<assign_check>')>
+    || <O('%list_assignment, :reducecheck<assign_check>, :childorder<right>')>
     ]
 }
 
