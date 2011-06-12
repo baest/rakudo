@@ -255,21 +255,57 @@ token pod_content:sym<block> {
 # any number of paragraphs of text
 token pod_content:sym<text> {
     <pod_newline>*
-    <pod_text_para> ** <pod_newline>+
+    <pod_textcontent> ** <pod_newline>+
     <pod_newline>*
 }
 
+proto token pod_textcontent { <...> }
+
 # a single paragraph of text
 token pod_text_para {
-    $<text> = [ \h* <!before '=' \w> \N+ \n ] +
+    $<text> = [
+        \h* <!before '=' \w> \N+ <pod_newline>
+    ] +
+}
+
+# text not being code
+token pod_textcontent:sym<regular> {
+    $<spaces>=[ \h* ]
+    <?{ $*VMARGIN >= 0 ?? ~$<spaces> eq $*VMARGIN !! 1 }>
+    $<text> = [
+        \h* <!before '=' \w> \N+ <pod_newline>
+    ] +
+}
+
+token pod_textcontent:sym<code> {
+    $<spaces>=[ \h* ]
+    <?{ $*VMARGIN >= 0 ?? ~$<spaces> ne $*VMARGIN !! 1 }>
+    $<text> = [
+        [<!before '=' \w> \N+] ** [<pod_newline> $<spaces>]
+    ]
 }
 
 proto token pod_block { <...> }
 
 token pod_block:sym<delimited> {
-    ^^ \h* '=begin' \h+ <!before 'END'> <identifier> <pod_newline>+
+    ^^
+    $<spaces> = [ \h* ]
+    {}
+    :my $*VMARGIN := ~$<spaces>;
+    '=begin' \h+ <!before 'END'> <identifier> <pod_newline>+
     [
      <pod_content> *
+     ^^ \h* '=end' \h+ $<identifier> <pod_newline>
+     ||  <.panic: '=begin without matching =end'>
+    ]
+}
+
+token pod_block:sym<delimited_raw> {
+    ^^ \h* '=begin' \h+ <!before 'END'>
+                    $<identifier>=[ 'code' || 'comment' ]
+                    <pod_newline>+
+    [
+     $<pod_content> = [ .*? ]
      ^^ \h* '=end' \h+ $<identifier> <pod_newline>
      ||  <.panic: '=begin without matching =end'>
     ]
@@ -290,8 +326,22 @@ token pod_block:sym<paragraph> {
     $<pod_content> = <pod_text_para> *
 }
 
+token pod_block:sym<paragraph_raw> {
+    ^^ \h* '=for' \h+ <!before 'END'>
+                      $<identifier>=[ 'code' || 'comment' ]
+                      <pod_newline>
+    $<pod_content> = <pod_text_para> *
+}
+
 token pod_block:sym<abbreviated> {
-    ^^ \h* '=' <!before begin || end || for || END> <identifier>
+    ^^ \h* '=' <!before begin || end || for || END>
+               <identifier> <pod_newline>?
+    $<pod_content> = <pod_text_para> *
+}
+
+token pod_block:sym<abbreviated_raw> {
+    ^^ \h* '=' $<identifier>=[ 'code' || 'comment' ]
+               [ <pod_newline> || \h+ ]?
     $<pod_content> = <pod_text_para> *
 }
 
@@ -315,6 +365,7 @@ token comp_unit {
     :my $*QSIGIL := '';                        # sigil of current interpolation
     :my $*TYPENAME := '';
     :my $*UNITPAST;
+    :my $*VMARGIN := -1;                       # the current virtual left margin for pod
     <.unitstart>
     <statementlist>
     [ $ || <.panic: 'Confused'> ]
