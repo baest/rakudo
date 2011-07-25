@@ -47,6 +47,7 @@ DYNEXT_DIR     = dynext
 PMC_DIR        = src/pmc
 OPS_DIR        = src/ops
 PERL6_LANG_DIR = $(PARROT_LIB_DIR)/languages/perl6
+LIBDIR	       = $(PARROT_LIB_DIR)/library
 MANDIR         = @mandir@
 DOCDIR         = @prefix@/share/doc
 
@@ -240,6 +241,17 @@ install: all
 	$(CP)     perl6.pbc           $(DESTDIR)$(PERL6_LANG_DIR)
 	$(CP)     Test.pm             $(DESTDIR)$(PERL6_LANG_DIR)/lib
 	$(CP)     Test.pir            $(DESTDIR)$(PERL6_LANG_DIR)/lib
+	$(MKPATH)                     $(DESTDIR)$(LIBDIR)/Perl6/
+	$(MKPATH)                     $(DESTDIR)$(LIBDIR)/blib/Perl6/
+	$(CP)    $(PERL6_G_PBC)       $(DESTDIR)$(LIBDIR)/Perl6/
+	$(CP)    $(PERL6_A_PBC)       $(DESTDIR)$(LIBDIR)/Perl6/
+	$(CP)    $(PERL6_M_PBC)       $(DESTDIR)$(LIBDIR)/Perl6/
+	$(CP)    $(PERL6_C_PBC)       $(DESTDIR)$(LIBDIR)/Perl6/
+	$(CP)    $(PERL6_ML_PBC)      $(DESTDIR)$(LIBDIR)/Perl6/
+	$(CP)    $(PERL6_SC_PBC)      $(DESTDIR)$(LIBDIR)/Perl6/
+	$(CP)    $(PERL6_ST_PBC)      $(DESTDIR)$(LIBDIR)/Perl6/
+	$(CP)    $(SETTING)           $(DESTDIR)$(LIBDIR)
+	$(CP)    $(PERL6_ML_PBC)      $(DESTDIR)$(LIBDIR)/blib/Perl6/
 
 	$(MKPATH)                     $(DESTDIR)$(PARROT_LIB_DIR)/dynext
 	$(CP)     $(DYNPMC) $(DYNOPS) $(DESTDIR)$(PARROT_LIB_DIR)/dynext

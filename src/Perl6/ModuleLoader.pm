@@ -24,6 +24,7 @@ class Perl6::ModuleLoader {
             my $prefix := %*COMPILING<%?OPTIONS><module-path>;
             if $prefix {
                 pir::push(@prefixes, $prefix);
+                pir::push(@prefixes, "$prefix/blib");
             } else {
                 pir::push(@prefixes, '.');
                 pir::push(@prefixes, 'blib');
