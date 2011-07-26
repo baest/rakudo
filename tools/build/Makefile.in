@@ -52,23 +52,23 @@ MANDIR         = @mandir@
 DOCDIR         = @prefix@/share/doc
 
 # files we create
-PERL6_PIR     = src/gen/perl6.pir
-PERL6_PBC     = perl6.pbc
-PERL6_EXE     = perl6$(EXE)
-PERL6_ML      = src/gen/perl6-moduleloader.pir
+PERL6_PIR     = blib/perl6.pir
+PERL6_PBC     = blib/perl6.pbc
+PERL6_EXE     = blib/perl6$(EXE)
+PERL6_ML      = blib/perl6-moduleloader.pir
 PERL6_ML_PBC  = blib/Perl6/ModuleLoader.pbc
-PERL6_ST      = src/gen/perl6-symboltable.pir
+PERL6_ST      = blib/perl6-symboltable.pir
 PERL6_ST_PBC  = blib/Perl6/SymbolTable.pbc
-PERL6_G       = src/gen/perl6-grammar.pir
+PERL6_G       = blib/perl6-grammar.pir
 PERL6_G_PBC   = blib/Perl6/Grammar.pbc
-PERL6_A       = src/gen/perl6-actions.pir
+PERL6_A       = blib/perl6-actions.pir
 PERL6_A_PBC   = blib/Perl6/Actions.pbc
-PERL6_C       = src/gen/perl6-compiler.pir
+PERL6_C       = blib/perl6-compiler.pir
 PERL6_C_PBC   = blib/Perl6/Compiler.pbc
-PERL6_M       = src/gen/perl6-metamodel.pir
+PERL6_M       = blib/perl6-metamodel.pir
 PERL6_M_PBC   = blib/Perl6/Metamodel.pbc
-SETTING_PIR   = src/gen/CORE.setting.pir
-SETTING       = CORE.setting.pbc
+SETTING_PIR   = blib/CORE.setting.pir
+SETTING       = blib/CORE.setting.pbc
 GROUP         = perl6_group
 OPS           = perl6_ops
 DYNEXT_TARGET = $(DYNEXT_DIR)/$(GROUP)$(LOAD_EXT)
@@ -205,10 +205,9 @@ CLEANUPS = \
   Test.pir \
   rakudo_test_run.tar.gz \
   $(DYNEXT_DIR)/*$(LOAD_EXT) \
-  src/gen/core.pm \
-  src/gen/*.pir \
-  src/gen/*.pbc \
-  src/gen/*.pm \
+  blib/*.pir \
+  blib/*.pbc \
+  blib/*.pm \
   $(PMC_DIR)/pmc_*.h \
   $(PMC_DIR)/*.c \
   $(PMC_DIR)/*.dump \
@@ -224,7 +223,7 @@ CLEANUPS = \
   $(OPS_DIR)/*$(O) \
   $(OPS_DIR)/*$(LOAD_EXT) \
   src/binder/*$(O) \
-  CORE.setting.pbc \
+  blib/CORE.setting.pbc \
 
 # NOTE: eventually, we should remove --keep-exit-code and --fudge
 #       as the goal is that all tests must pass without fudge

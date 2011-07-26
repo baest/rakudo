@@ -1,3 +1,8 @@
+nqp::unshift(
+    pir::getinterp__P()[pir::const::IGLOBALS_LIB_PATHS][1],
+    'blib'
+);
+
 use Perl6::Grammar;
 use Perl6::Actions;
 use Perl6::Compiler;
